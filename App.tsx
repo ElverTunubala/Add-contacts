@@ -1,27 +1,6 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import homescreem from './src/components/homescreem';
+import AppNavigator from './src/navigation/AppNavigator';
 
-
-interface Contact {
-  name: string;
-  phone: string;
-  email:string;
-}
-const Stack = createStackNavigator()
-
-const App: React.FC = () => {
-  
-
-
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={homescreem} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
+const App = () => <AppNavigator />;
 
 export default App;
