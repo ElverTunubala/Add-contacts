@@ -7,18 +7,22 @@ interface ContactCardProps {
   onPress: () => void;
 }
 
-const ContactCard: React.FC<ContactCardProps> = ({ contact, onPress }) => (
-  <TouchableOpacity style={styles.card} onPress={onPress}>
-    <Image
-      source={{ uri: contact.photo || 'https://via.placeholder.com/50' }}
-      style={styles.image}
-    />
-    <View style={styles.info}>
-      <Text style={styles.name}>{contact.name}</Text>
-      <Text style={styles.phone}>{contact.phone}</Text>
-    </View>
-  </TouchableOpacity>
-);
+const ContactCard: React.FC<ContactCardProps> = ({ contact, onPress }) => {
+  console.log('Contact data:', contact); // Verifica que los datos sean correctos
+  return (
+    <TouchableOpacity style={styles.card} onPress={onPress}>
+      <Image
+        source={{ uri: contact.photo || 'https://via.placeholder.com/50' }}
+        style={styles.image}
+      />
+      <View style={styles.info}>
+        <Text style={styles.name}>{contact.name}</Text>
+        <Text style={styles.phone}>{contact.phone}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 
 const styles = StyleSheet.create({
   card: {

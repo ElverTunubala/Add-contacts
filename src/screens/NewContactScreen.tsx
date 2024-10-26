@@ -24,9 +24,14 @@ const NewContactScreen: React.FC<NewContactScreenProps> = ({ navigation }) => {
 
   const handleAddContact = () => {
     if (name && phone && email) {
+      console.log('Agregando contacto:', { name, phone, email, photo });
       addContact({ name, phone, email, photo });
       navigation.goBack();
     }
+    else {
+      console.warn('Por favor completa todos los campos.');
+    }
+    
   };
 
   const selectImage = async () => {

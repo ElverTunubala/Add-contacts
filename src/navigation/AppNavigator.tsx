@@ -18,8 +18,8 @@ const AppNavigator = () => (
   <NavigationContainer>
     <Stack.Navigator initialRouteName="ContactList">
       <Stack.Screen name="ContactList" component={ContactListScreen} />
-      <Stack.Screen name="ContactDetails" component={ContactDetailsScreen} />
       <Stack.Screen name="NewContact" component={NewContactScreen} />
+      <Stack.Screen name="ContactDetails" component={ContactDetailsScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );
