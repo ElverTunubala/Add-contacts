@@ -10,7 +10,6 @@ export const useContacts = () => {
   const loadContacts = async () => {
     try {
       const data = await AsyncStorage.getItem('contacts');
-      console.log('Datos recuperados de AsyncStorage:', data);
       if (data) setContacts(JSON.parse(data));
     } catch (error) {
       console.error('Error al cargar contactos:', error);

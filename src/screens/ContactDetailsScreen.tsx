@@ -4,7 +4,8 @@ import { RouteProp, useNavigation } from '@react-navigation/native';
 import { useContacts } from '../hooks/useContacts';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Icon from 'react-native-vector-icons/Ionicons';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 type ContactDetailsScreenRouteProp = RouteProp<RootStackParamList, 'ContactDetails'>;
 type ContactDetailsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ContactDetails'>;
@@ -19,7 +20,6 @@ const ContactDetailsScreen: React.FC<ContactDetailsScreenProps> = ({ route }) =>
   const { deleteContact, updateContact } = useContacts();
   const navigation = useNavigation();
 
-  // State para el modal y campos de actualización
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState(contact.name);
   const [phone, setPhone] = useState(contact.phone);
@@ -51,24 +51,24 @@ const ContactDetailsScreen: React.FC<ContactDetailsScreenProps> = ({ route }) =>
       <Image source={{ uri: contact.photo || 'https://via.placeholder.com/100' }} style={styles.image} />
       <Text style={styles.name}>{contact.name}</Text>
       <Text style={styles.phone}>{contact.phone}</Text>
-      <Text style={styles.email}>{contact.email}</Text >
-      <Button title="Eliminar" onPress={handleDelete} />
-      <Icon name="accessibility-outline" />;
-      
-      {/* Botón para abrir el modal */}
-      <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <Text style={styles.openModalText}>Actualizar Contacto</Text>
+      <Text style={styles.email}>{contact.email}</Text>
+
+      <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+        <Text style={styles.deleteButtonText}>Eliminar</Text>
       </TouchableOpacity>
 
-      {/* Modal para actualizar contacto */}
+      <TouchableOpacity style={styles.editButton} onPress={() => setModalVisible(true)}>
+        <AntDesign name="edit" size={24} color="#fff" />
+      </TouchableOpacity>
+
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Actualizar Contacto</Text>
             <TextInput
               style={styles.input}
@@ -90,8 +90,12 @@ const ContactDetailsScreen: React.FC<ContactDetailsScreenProps> = ({ route }) =>
               placeholder="Correo"
               keyboardType="email-address"
             />
-            <Button title="Actualizar" onPress={handleUpdate} />
-            <Button title="Cerrar" onPress={() => setModalVisible(false)} color="gray" />
+            <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
+              <Text style={styles.updateButtonText}>Actualizar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.closeButtonText}>Cerrar</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -104,57 +108,109 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#f7f7f7',
   },
   image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#4CAF50',
   },
   name: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#333',
+    marginBottom: 5,
   },
   phone: {
     fontSize: 18,
-    color: 'gray',
+    color: '#666',
     marginBottom: 5,
   },
   email: {
     fontSize: 16,
-    color: 'gray',
+    color: '#888',
     marginBottom: 20,
   },
-  openModalText: {
-    color: 'blue',
+  deleteButton: {
+    backgroundColor: '#ff5252',
+    padding: 10,
+    borderRadius: 8,
     marginTop: 10,
-    textDecorationLine: 'underline',
+    paddingHorizontal: 20,
   },
-  modalContainer: {
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  editButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 8,
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    alignItems: 'center',
+  },
+  modalOverlay: {
     flex: 1,
+   
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
-    width: '80%',
+  modalContainer: {
+    width: '85%',
     backgroundColor: 'white',
-    borderRadius: 10,
+    borderRadius: 15,
     padding: 20,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 20,
+    color: '#4CAF50',
   },
   input: {
     width: '100%',
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: '#ddd',
     padding: 10,
+    marginBottom: 15,
+    borderRadius: 10,
+    fontSize: 16,
+    backgroundColor: '#f9f9f9',
+  },
+  updateButton: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
     marginBottom: 10,
-    borderRadius: 5,
+  },
+  updateButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  closeButton: {
+    backgroundColor: '#aaa',
+    padding: 10,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: '500',
   },
 });
 
