@@ -5,11 +5,13 @@ import ContactListScreen from '../screens/ContactListScreen';
 import NewContactScreen from '../screens/NewContactScreen';
 import ContactDetailsScreen from '../screens/ContactDetailsScreen';
 import { Contact } from '../interfaces/Contact';
+import MapScreen from '../screens/MapScreen';
 
 export type RootStackParamList = {
   ContactList: undefined;
   ContactDetails: { contact: Contact };
   NewContact: undefined;
+  ContactMaps:{ onSelectLocation: (address: string) => void };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -20,6 +22,7 @@ const AppNavigator = () => (
       <Stack.Screen name="ContactList" component={ContactListScreen} />
       <Stack.Screen name="NewContact" component={NewContactScreen} />
       <Stack.Screen name="ContactDetails" component={ContactDetailsScreen} />
+      <Stack.Screen name="ContactMaps" component={MapScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

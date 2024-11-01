@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Image, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, TextInput, Button, Image, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
 import { useContacts } from '../hooks/useContacts';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { requestCameraPermissions } from '../permissions/camera';
+import { requestGalleryPermissions } from '../permissions/gallery';
 
 type NewContactScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -20,10 +22,11 @@ const NewContactScreen: React.FC<NewContactScreenProps> = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [photo, setPhoto] = useState<string | undefined>();
+  const [address, setAddress] = useState<string | undefined>(); // Estado para la dirección
 
   const handleAddContact = () => {
     if (name && phone && email) {
-      addContact({ name, phone, email, photo });
+      addContact({ name, phone, email, photo, address }); // Guardar dirección
       navigation.goBack();
     } else {
       console.warn('Por favor completa todos los campos.');
@@ -31,17 +34,33 @@ const NewContactScreen: React.FC<NewContactScreenProps> = ({ navigation }) => {
   };
 
   const selectImageFromLibrary = async () => {
-    const result = await launchImageLibrary({ mediaType: 'photo' });
-    if (result.assets && result.assets.length > 0) {
-      setPhoto(result.assets[0].uri);
+    const hasPermission = await requestGalleryPermissions();
+    if (hasPermission) {
+        const result = await launchImageLibrary({ mediaType: 'photo' });
+        if (result.assets && result.assets.length > 0) {
+            setPhoto(result.assets[0].uri);
+        }
+    } else {
+        Alert.alert('Permiso de galería denegado');
     }
   };
 
   const takePhoto = async () => {
-    const result = await launchCamera({ mediaType: 'photo' });
-    if (result.assets && result.assets.length > 0) {
-      setPhoto(result.assets[0].uri);
+    const hasPermission = await requestCameraPermissions();
+    if (hasPermission) {
+        const result = await launchCamera({ mediaType: 'photo' });
+        if (result.assets && result.assets.length > 0) {
+            setPhoto(result.assets[0].uri);
+        }
+    } else {
+        Alert.alert('Permiso de cámara denegado');
     }
+  };
+
+  const openMaps = () => {
+    navigation.navigate('ContactMaps', {
+      onSelectLocation: (selectedAddress: string) => setAddress(selectedAddress) 
+    });
   };
 
   return (
@@ -80,6 +99,10 @@ const NewContactScreen: React.FC<NewContactScreenProps> = ({ navigation }) => {
 
       <TouchableOpacity style={styles.addButton} onPress={handleAddContact}>
         <Text style={styles.addButtonText}>Agregar Contacto</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.addButton} onPress={openMaps}>
+        <Text style={styles.buttonText}>Agregar Dirección</Text>
       </TouchableOpacity>
     </View>
   );
