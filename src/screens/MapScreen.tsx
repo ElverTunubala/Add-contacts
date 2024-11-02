@@ -8,14 +8,15 @@ type MapScreenRouteProp = RouteProp<RootStackParamList, 'ContactMaps'>;
 
 const MapScreen = () => {
   const route = useRoute<MapScreenRouteProp>();
-  const { onSelectLocation } = route.params; // Asegúrate de recibir la función
+  const { onSelectLocation } = route.params; 
   const mapRef = useRef<MapView | null>(null);
   const [coordinates, setCoordinates] = React.useState<{ latitude: number; longitude: number } | null>(null);
 
   const handlePress = (event: any) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
     setCoordinates({ latitude, longitude });
-    onSelectLocation(`Lat: ${latitude}, Lng: ${longitude}`); // Pasar la dirección
+    onSelectLocation(`Lat: ${latitude}, Lng: ${longitude}`); 
+    console.log(latitude,longitude)// Pasar la dirección
   };
 
   return (

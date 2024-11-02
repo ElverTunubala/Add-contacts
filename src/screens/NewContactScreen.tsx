@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Image, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
+import { View, TextInput, Image, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
 import { useContacts } from '../hooks/useContacts';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { requestCameraPermissions } from '../permissions/camera';
 import { requestGalleryPermissions } from '../permissions/gallery';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 type NewContactScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -36,30 +38,30 @@ const NewContactScreen: React.FC<NewContactScreenProps> = ({ navigation }) => {
   const selectImageFromLibrary = async () => {
     const hasPermission = await requestGalleryPermissions();
     if (hasPermission) {
-        const result = await launchImageLibrary({ mediaType: 'photo' });
-        if (result.assets && result.assets.length > 0) {
-            setPhoto(result.assets[0].uri);
-        }
+      const result = await launchImageLibrary({ mediaType: 'photo' });
+      if (result.assets && result.assets.length > 0) {
+        setPhoto(result.assets[0].uri);
+      }
     } else {
-        Alert.alert('Permiso de galería denegado');
+      Alert.alert('Permiso de galería denegado');
     }
   };
 
   const takePhoto = async () => {
     const hasPermission = await requestCameraPermissions();
     if (hasPermission) {
-        const result = await launchCamera({ mediaType: 'photo' });
-        if (result.assets && result.assets.length > 0) {
-            setPhoto(result.assets[0].uri);
-        }
+      const result = await launchCamera({ mediaType: 'photo' });
+      if (result.assets && result.assets.length > 0) {
+        setPhoto(result.assets[0].uri);
+      }
     } else {
-        Alert.alert('Permiso de cámara denegado');
+      Alert.alert('Permiso de cámara denegado');
     }
   };
 
   const openMaps = () => {
     navigation.navigate('ContactMaps', {
-      onSelectLocation: (selectedAddress: string) => setAddress(selectedAddress) 
+      onSelectLocation: (selectedAddress: string) => setAddress(selectedAddress),
     });
   };
 
@@ -85,24 +87,28 @@ const NewContactScreen: React.FC<NewContactScreenProps> = ({ navigation }) => {
         onChangeText={setEmail} 
         keyboardType="email-address" 
       />
+      <Text style={styles.selectText}>Seleccionar Foto</Text>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={selectImageFromLibrary}>
-          <Text style={styles.buttonText}>Seleccionar Foto</Text>
+          <AntDesign name="picture" size={30} color="#fff" />
+          <Text style={styles.buttonText}>Galería</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={takePhoto}>
-          <Text style={styles.buttonText}>Tomar Foto</Text>
+          <AntDesign name="camerao" size={30} color="#fff" />
+          <Text style={styles.buttonText}>Cámara</Text>
         </TouchableOpacity>
       </View>
 
       {photo && <Image source={{ uri: photo }} style={styles.image} />}
 
-      <TouchableOpacity style={styles.addButton} onPress={handleAddContact}>
-        <Text style={styles.addButtonText}>Agregar Contacto</Text>
+      <TouchableOpacity style={styles.addMap} onPress={openMaps}>
+        <EvilIcons name="location" size={30} color="#fff" />
+        <Text style={styles.buttonText}>Ubicación</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.addButton} onPress={openMaps}>
-        <Text style={styles.buttonText}>Agregar Dirección</Text>
+      <TouchableOpacity style={styles.addButton} onPress={handleAddContact}>
+        <Text style={styles.addButtonText}>Agregar Contacto</Text>
       </TouchableOpacity>
     </View>
   );
@@ -112,7 +118,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start', // Alinear hacia el inicio
     padding: 20,
     backgroundColor: '#f5f5f5',
   },
@@ -127,21 +133,27 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around', // Distribución mejorada
     width: '100%',
-    marginBottom: 15,
+    marginBottom: 20, // Mayor separación
   },
   button: {
     flex: 1,
-    marginHorizontal: 5,
-    backgroundColor: '#007BFF',
-    borderRadius: 5,
-    padding: 15,
+    backgroundColor: '#1E90FF',
+    borderRadius: 15,
+    paddingVertical: 10,
     alignItems: 'center',
+    marginHorizontal: 20, // Margen horizontal entre botones
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+    marginTop: 5, // Espacio entre el icono y el texto
+  },
+  selectText: {
+    color: '#777',
+    fontWeight: 'bold',
+    marginVertical: 10, // Espacio vertical adicional
   },
   image: {
     width: 100,
@@ -155,6 +167,17 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     width: '100%',
+    marginTop: 20, // Mayor separación
+  },
+  addMap: {
+    flexDirection: 'row',
+    backgroundColor: '#1E90FF',
+    borderRadius: 5,
+    padding: 15,
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'center', // Centrado del contenido
+    marginTop: 15, // Espacio superior
   },
   addButtonText: {
     color: '#fff',
