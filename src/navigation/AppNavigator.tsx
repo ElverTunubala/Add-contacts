@@ -11,7 +11,7 @@ export type RootStackParamList = {
   ContactList: undefined;
   ContactDetails: { contact: Contact };
   NewContact: undefined;
-  ContactMaps:{ onSelectLocation: (address: string) => void };
+  ContactMaps: undefined; 
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

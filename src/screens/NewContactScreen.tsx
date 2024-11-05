@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, TextInput, Image, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
+import { View, TextInput, Image, StyleSheet, TouchableOpacity, Text, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useContacts } from '../hooks/useContacts';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { requestCameraPermissions } from '../permissions/camera';
 import { requestGalleryPermissions } from '../permissions/gallery';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
@@ -18,23 +19,26 @@ interface NewContactScreenProps {
   navigation: NewContactScreenNavigationProp;
 }
 
-const NewContactScreen: React.FC<NewContactScreenProps> = ({ navigation }) => {
+const NewContactScreen: React.FC<NewContactScreenProps> = () => {
+  const navigation = useNavigation<NewContactScreenNavigationProp>();
   const { addContact } = useContacts();
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [photo, setPhoto] = useState<string | undefined>();
-  const [address, setAddress] = useState<string | undefined>(); // Estado para la dirección
+  const [address, setAddress] = useState<string | undefined>();
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   const handleAddContact = () => {
     if (name && phone && email) {
-      addContact({ name, phone, email, photo, address }); // Guardar dirección
+      addContact({ name, phone, email, photo, address });
       navigation.goBack();
     } else {
       console.warn('Por favor completa todos los campos.');
     }
   };
-
+ 
   const selectImageFromLibrary = async () => {
     const hasPermission = await requestGalleryPermissions();
     if (hasPermission) {
@@ -60,65 +64,77 @@ const NewContactScreen: React.FC<NewContactScreenProps> = ({ navigation }) => {
   };
 
   const openMaps = () => {
-    navigation.navigate('ContactMaps', {
-      onSelectLocation: (selectedAddress: string) => setAddress(selectedAddress),
-    });
+    navigation.navigate('ContactMaps');
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      // Esta función se ejecutará cada vez que regreses a esta pantalla
+      if (location) {
+        setAddress(`Lat: ${location.latitude}, Lng: ${location.longitude}`);
+      }
+    }, [location])
+  );
+
   return (
-    <View style={styles.container}>
-      <TextInput 
-        style={styles.input} 
-        placeholder="Nombre" 
-        value={name} 
-        onChangeText={setName} 
-      />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Teléfono" 
-        value={phone} 
-        onChangeText={setPhone} 
-        keyboardType="phone-pad" 
-      />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Correo" 
-        value={email} 
-        onChangeText={setEmail} 
-        keyboardType="email-address" 
-      />
-      <Text style={styles.selectText}>Seleccionar Foto</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Nombre" 
+          value={name} 
+          onChangeText={setName} 
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Teléfono" 
+          value={phone} 
+          onChangeText={setPhone} 
+          keyboardType="phone-pad" 
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Correo" 
+          value={email} 
+          onChangeText={setEmail} 
+          keyboardType="email-address" 
+        />
+        <Text style={styles.selectText}>Seleccionar Foto</Text>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={selectImageFromLibrary}>
-          <AntDesign name="picture" size={30} color="#fff" />
-          <Text style={styles.buttonText}>Galería</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={selectImageFromLibrary}>
+            <AntDesign name="picture" size={30} color="#fff" />
+            <Text style={styles.buttonText}>Galería</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={takePhoto}>
+            <AntDesign name="camerao" size={30} color="#fff" />
+            <Text style={styles.buttonText}>Cámara</Text>
+          </TouchableOpacity>
+        </View>
+
+        {photo && <Image source={{ uri: photo }} style={styles.image} />}
+
+        <TouchableOpacity style={styles.addMap} onPress={openMaps}>
+          <EvilIcons name="location" size={30} color="#fff" />
+          <Text style={styles.buttonText}>Ubicación</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={takePhoto}>
-          <AntDesign name="camerao" size={30} color="#fff" />
-          <Text style={styles.buttonText}>Cámara</Text>
+    
+        <TouchableOpacity style={styles.addButton} onPress={handleAddContact}>
+          <Text style={styles.addButtonText}>Agregar Contacto</Text>
         </TouchableOpacity>
-      </View>
-
-      {photo && <Image source={{ uri: photo }} style={styles.image} />}
-
-      <TouchableOpacity style={styles.addMap} onPress={openMaps}>
-        <EvilIcons name="location" size={30} color="#fff" />
-        <Text style={styles.buttonText}>Ubicación</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.addButton} onPress={handleAddContact}>
-        <Text style={styles.addButtonText}>Agregar Contacto</Text>
-      </TouchableOpacity>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start', // Alinear hacia el inicio
+    justifyContent: 'flex-start',
     padding: 20,
     backgroundColor: '#f5f5f5',
   },
@@ -133,9 +149,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Distribución mejorada
+    justifyContent: 'space-around',
     width: '100%',
-    marginBottom: 20, // Mayor separación
+    marginBottom: 20, 
   },
   button: {
     flex: 1,
@@ -143,22 +159,22 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingVertical: 10,
     alignItems: 'center',
-    marginHorizontal: 20, // Margen horizontal entre botones
+    marginHorizontal: 20,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
-    marginTop: 5, // Espacio entre el icono y el texto
+    marginTop: 5,
   },
   selectText: {
     color: '#777',
     fontWeight: 'bold',
-    marginVertical: 10, // Espacio vertical adicional
+    marginVertical: 10,
   },
   image: {
-    width: 100,
+    width: '85%',
     height: 100,
-    marginBottom: 15,
+    marginBottom: 5,
     borderRadius: 10,
   },
   addButton: {
@@ -167,7 +183,7 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     width: '100%',
-    marginTop: 20, // Mayor separación
+    marginTop: 20,
   },
   addMap: {
     flexDirection: 'row',
@@ -176,12 +192,17 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     width: '100%',
-    justifyContent: 'center', // Centrado del contenido
-    marginTop: 15, // Espacio superior
+    justifyContent: 'center',
+    marginTop: 15,
   },
   addButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  addressText: {
+    color: '#333',
+    marginVertical: 10,
+    fontSize: 16,
   },
 });
 

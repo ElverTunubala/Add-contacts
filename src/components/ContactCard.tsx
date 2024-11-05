@@ -23,7 +23,6 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onPress }) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',

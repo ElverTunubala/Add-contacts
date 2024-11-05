@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Button, Image, StyleSheet, Alert, TextInput, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, Alert, TextInput, Modal, TouchableOpacity } from 'react-native';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { useContacts } from '../hooks/useContacts';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import IonIcon from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 type ContactDetailsScreenRouteProp = RouteProp<RootStackParamList, 'ContactDetails'>;
@@ -45,13 +44,17 @@ const ContactDetailsScreen: React.FC<ContactDetailsScreenProps> = ({ route }) =>
     setModalVisible(false);
     navigation.goBack();
   };
-
-  return (
+   return (
     <View style={styles.container}>
       <Image source={{ uri: contact.photo || 'https://via.placeholder.com/100' }} style={styles.image} />
+      <Text style={styles.phone}>Nombre</Text>
       <Text style={styles.name}>{contact.name}</Text>
+      <Text style={styles.phone}>Celular</Text>
       <Text style={styles.phone}>{contact.phone}</Text>
+      <Text style={styles.phone}>Correo</Text>
       <Text style={styles.email}>{contact.email}</Text>
+      <Text style={styles.phone}>Direccion</Text>
+      <Text style={styles.email}>{contact.address}</Text>
 
       <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
         <Text style={styles.deleteButtonText}>Eliminar</Text>
