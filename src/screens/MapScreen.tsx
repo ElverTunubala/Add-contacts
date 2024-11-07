@@ -19,16 +19,15 @@ const MapScreen: React.FC = () => {
     onSelectLocation({ latitude, longitude });
   };
 
-  // Esta función se encargará de pasar la ubicación seleccionada de vuelta
   const onSelectLocation = (location: { latitude: number; longitude: number }) => {
     console.log('Ubicación seleccionada:', location);
-    
+
     setTimeout(() => {
-      navigation.goBack();
-    }, 8000); 
+      navigation.navigate('NewContact', { location });
+    }, 5000); 
   };
+
   useEffect(() => {
-    // Hide loading indicator once map has loaded
     setLoading(false);
   }, []);
 

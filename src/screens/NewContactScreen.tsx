@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TextInput, Image, StyleSheet, TouchableOpacity, Text, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useContacts } from '../hooks/useContacts';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
@@ -6,33 +6,38 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { requestCameraPermissions } from '../permissions/camera';
 import { requestGalleryPermissions } from '../permissions/gallery';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
-type NewContactScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'NewContact'
->;
+type NewContactScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'NewContact'>;
+type NewContactScreenRouteProp = RouteProp<RootStackParamList, 'NewContact'>; // Define el tipo para la ruta
 
-interface NewContactScreenProps {
-  navigation: NewContactScreenNavigationProp;
-}
+interface NewContactScreenProps {navigation: NewContactScreenNavigationProp}
 
 const NewContactScreen: React.FC<NewContactScreenProps> = () => {
   const navigation = useNavigation<NewContactScreenNavigationProp>();
   const { addContact } = useContacts();
+  const route = useRoute<NewContactScreenRouteProp>(); 
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [photo, setPhoto] = useState<string | undefined>();
-  const [address, setAddress] = useState<string | undefined>();
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+   // useEffect para actualizar el estado de location si recibimos coordenadas
+   useEffect(() => {
+    console.log("estado de location: ",route.params?.location);
+    if (route.params?.location) {
+      setLocation(route.params.location);
+    }
+  }, [route.params?.location]);
+  
 
   const handleAddContact = () => {
     if (name && phone && email) {
-      addContact({ name, phone, email, photo, address });
+      addContact({ name, phone, email, photo, address:location });
       navigation.goBack();
     } else {
       console.warn('Por favor completa todos los campos.');
@@ -71,7 +76,7 @@ const NewContactScreen: React.FC<NewContactScreenProps> = () => {
     React.useCallback(() => {
       // Esta función se ejecutará cada vez que regreses a esta pantalla
       if (location) {
-        setAddress(`Lat: ${location.latitude}, Lng: ${location.longitude}`);
+        console.log("soy location de add contacts", location);
       }
     }, [location])
   );
@@ -116,6 +121,13 @@ const NewContactScreen: React.FC<NewContactScreenProps> = () => {
         </View>
 
         {photo && <Image source={{ uri: photo }} style={styles.image} />}
+
+        {location && (
+          <Text style={styles.addressText}>
+            Latitud: {location.latitude},
+            Longitud: {location.longitude}
+          </Text>
+        )}
 
         <TouchableOpacity style={styles.addMap} onPress={openMaps}>
           <EvilIcons name="location" size={30} color="#fff" />

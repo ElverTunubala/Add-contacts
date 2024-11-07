@@ -47,14 +47,32 @@ const ContactDetailsScreen: React.FC<ContactDetailsScreenProps> = ({ route }) =>
    return (
     <View style={styles.container}>
       <Image source={{ uri: contact.photo || 'https://via.placeholder.com/100' }} style={styles.image} />
-      <Text style={styles.phone}>Nombre</Text>
-      <Text style={styles.name}>{contact.name}</Text>
-      <Text style={styles.phone}>Celular</Text>
-      <Text style={styles.phone}>{contact.phone}</Text>
-      <Text style={styles.phone}>Correo</Text>
-      <Text style={styles.email}>{contact.email}</Text>
-      <Text style={styles.phone}>Direccion</Text>
-      <Text style={styles.email}>{contact.address}</Text>
+      
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>Nombre</Text>
+        <Text style={styles.name}>{contact.name}</Text>
+      </View>
+
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>Celular</Text>
+        <Text style={styles.phone}>{contact.phone}</Text>
+      </View>
+
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>Correo</Text>
+        <Text style={styles.email}>{contact.email}</Text>
+      </View>
+
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>Dirección</Text>
+        {contact.address ? (
+          <Text style={styles.address}>
+            Latitude: {contact.address.latitude}, Longitude: {contact.address.longitude}
+          </Text>
+        ) : (
+          <Text style={styles.address}>No disponible</Text>
+        )}
+      </View>
 
       <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
         <Text style={styles.deleteButtonText}>Eliminar</Text>
@@ -110,6 +128,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    justifyContent:'center',
     padding: 20,
     backgroundColor: '#f7f7f7',
   },
@@ -121,27 +140,39 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#4CAF50',
   },
+  infoContainer: {
+    width: '100%',
+    marginBottom: 15,
+    paddingHorizontal: 10,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4CAF50',
+    marginBottom: 3,
+  },
   name: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 5,
   },
   phone: {
     fontSize: 18,
-    color: '#666',
-    marginBottom: 5,
+    color: '#555',
   },
   email: {
-    fontSize: 16,
-    color: '#888',
-    marginBottom: 20,
+    fontSize: 18,
+    color: '#555',
+  },
+  address: {
+    fontSize: 18,
+    color: '#555',
   },
   deleteButton: {
     backgroundColor: '#ff5252',
     padding: 10,
     borderRadius: 8,
-    marginTop: 10,
+    marginTop: 20,
     paddingHorizontal: 20,
   },
   deleteButtonText: {
@@ -159,7 +190,6 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-   
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },

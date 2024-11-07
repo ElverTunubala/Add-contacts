@@ -10,7 +10,8 @@ import MapScreen from '../screens/MapScreen';
 export type RootStackParamList = {
   ContactList: undefined;
   ContactDetails: { contact: Contact };
-  NewContact: undefined;
+  NewContact: { location: { latitude: number; longitude: number } } | undefined; 
+  // NewContact: undefined;
   ContactMaps: undefined; 
 };
 
