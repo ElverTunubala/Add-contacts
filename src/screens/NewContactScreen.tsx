@@ -9,6 +9,7 @@ import { requestGalleryPermissions } from '../permissions/gallery';
 import { useFocusEffect, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
+import { checkLocationPermission, requestLocationPermission } from '../permissions/location';
 
 type NewContactScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'NewContact'>;
 type NewContactScreenRouteProp = RouteProp<RootStackParamList, 'NewContact'>; // Define el tipo para la ruta
@@ -68,8 +69,24 @@ const NewContactScreen: React.FC<NewContactScreenProps> = () => {
     }
   };
 
-  const openMaps = () => {
-    navigation.navigate('ContactMaps');
+  const openMaps = async () => {
+    try {
+      const permissionStatus = await checkLocationPermission();
+
+      if (permissionStatus !== 'granted') {
+        const requestStatus = await requestLocationPermission();
+
+        if (requestStatus !== 'granted') {
+          Alert.alert('Location Permission', 'Location permission is required to access the map.');
+          return;
+        }
+      }
+      navigation.navigate('ContactMaps');
+  
+    } catch (error) {
+      console.error('Error checking or requesting permission:', error);
+      Alert.alert('Error', 'There was an issue with location permissions.');
+    }
   };
 
   useFocusEffect(
